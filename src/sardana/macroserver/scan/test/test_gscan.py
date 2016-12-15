@@ -23,7 +23,12 @@
 ##
 ##############################################################################
 
-from mock import MagicMock, patch
+SKIP_TEST = False
+
+try:
+    from mock import MagicMock, patch
+except ImportError:
+    SKIP_TEST = True
 
 from taurus.external import unittest
 from taurus.test import insertTest
@@ -39,6 +44,10 @@ from sardana.macroserver.msexception import UnknownEnv
             expected={"initial_pos": -5,
                       "final_pos": 15})
 class CTScanTestCase(unittest.TestCase):
+
+    def setUp(self):
+        if SKIP_TEST:
+            self.skipTest("mock module is not available")
 
     @staticmethod
     def getEnv(name):
