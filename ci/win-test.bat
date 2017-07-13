@@ -1,7 +1,7 @@
 :: Install (py)tango + deps
 conda install  -y  -c tango-controls pytango=9.2.1
 :: Install itango
-conda install -c tango-controls itango=0.1.6
+conda install -y -c tango-controls itango=0.1.6
 :: Loging root env
 activate
 :: Install taurus

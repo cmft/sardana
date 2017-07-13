@@ -8,18 +8,19 @@ environment:
 
     matrix:
         # Python 2.7 (64)
-        - PYTHON_DIR: "C:\\Python27-x64"
-          QT_BINDINGS: "PyQt4"
+        - PYTHON: "C:\\Miniconda-x64"
+          PYTHON_VERSION: "2.7"
+          PYTHON_ARCH: "64"
           TEST_SCRIPT: "ci\\win-test.bat"
 
         # Python 2.7
-        - PYTHON_DIR: "C:\\Python27"
-          QT_BINDINGS: "PyQt4"
+        - PYTHON: "C:\\Miniconda"
+          PYTHON_VERSION: "2.7"
+          PYTHON_ARCH: "32"
           TEST_SCRIPT: "ci\\win-test.bat"
 
 
 install:
-
     # Add Python to PATH
     - "SET PATH=%PYTHON_DIR%;%PYTHON_DIR%\\Scripts;%PATH%"
 
@@ -49,16 +50,10 @@ build_script:
 
 
 test_script:
-    # Create test virtualenv
-    - "virtualenv --clear %VENV_TEST_DIR%"
-    - "%VENV_TEST_DIR%\\Scripts\\activate.bat"
-
+    - set "PATH=%CONDA_ROOT%;%CONDA_ROOT%\Scripts;%CONDA_ROOT%\Library\bin;%PATH%"
+    - set PATH
     # Run the test script
     - "%TEST_SCRIPT%"
-
-    # Leave test virtualenv
-    - "%VENV_TEST_DIR%\\Scripts\\deactivate.bat"
-    - "rmdir %VENV_TEST_DIR% /s /q"
 
 
 artifacts:
