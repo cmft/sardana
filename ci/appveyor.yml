@@ -1,0 +1,101 @@
+# fetch repository as zip archive
+shallow_clone: true
+
+environment:
+    global:
+        VENV_BUILD_DIR: "venv_build"
+        VENV_TEST_DIR: "venv_test"
+
+    matrix:
+        # Python 2.7 (64)
+        - PYTHON_DIR: "C:\\Python27-x64"
+          QT_BINDINGS: "PyQt4"
+          TEST_SCRIPT: "ci\\win-test.bat"
+
+        # Python 2.7
+        - PYTHON_DIR: "C:\\Python27"
+          QT_BINDINGS: "PyQt4"
+          TEST_SCRIPT: "ci\\win-test.bat"
+
+
+install:
+
+    # Add Python to PATH
+    - "SET PATH=%PYTHON_DIR%;%PYTHON_DIR%\\Scripts;%PATH%"
+
+    # Upgrade/install distribution modules
+    - "pip install --upgrade setuptools"
+    - "python -m pip install --upgrade pip"
+
+    # Install virtualenv
+    - "pip install --upgrade virtualenv"
+    - "virtualenv --version"
+
+build_script:
+    # Create build virtualenv
+    - "virtualenv --clear %VENV_BUILD_DIR%"
+    - "%VENV_BUILD_DIR%\\Scripts\\activate.bat"
+
+    # Install wheel
+    - "pip install --upgrade wheel"
+
+    # Build sardana sdist, msi and wheel
+    - "python setup.py sdist bdist_wheel bdist_msi"
+    - ps: "ls dist"
+
+    # Leave build virtualenv
+    - "%VENV_BUILD_DIR%\\Scripts\\deactivate.bat"
+    - "rmdir %VENV_BUILD_DIR% /s /q"
+
+
+test_script:
+    # Create test virtualenv
+    - "virtualenv --clear %VENV_TEST_DIR%"
+    - "%VENV_TEST_DIR%\\Scripts\\activate.bat"
+
+    # Run the test script
+    - "%TEST_SCRIPT%"
+
+    # Leave test virtualenv
+    - "%VENV_TEST_DIR%\\Scripts\\deactivate.bat"
+    - "rmdir %VENV_TEST_DIR% /s /q"
+
+
+artifacts:
+    # Archive the generated sdist, wheel and msi packages in the ci.appveyor.com build report.
+    - path: dist\*.tar.gz
+      name: sardana_SDIST
+
+    - path: dist\*.msi
+      name: sardana_MSI
+
+    - path: dist\*.whl
+      name: sardana_WHEEL
+
+## TODO: re-enable deployments
+## For now, we disable deploy (we got repeated deploys for the same commit after 
+## merging PR #357.
+##
+### See https://www.appveyor.com/docs/deployment/github/
+#deploy:
+#    # create unnoficial pre-release
+#    - provider: GitHub
+#      tag: sardana-build$(appveyor_build_version)
+#      description: 'Unofficial Windows release'
+#      auth_token:
+#          # encrypted token for repo access by the admin bot
+#          secure: 7xvY9HsADz3TiTRQ8yiumBWwCQ7GI+DrA04rlzzBo+G9DBCk7py3FvLLgfEvYW+u
+#      artifact: sardana_WHEEL
+#      prerelease: true
+#
+#    # create draft release on tags to master
+#    - provider: GitHub
+#      description: 'Taurus Windows installer'
+#      auth_token:
+#          # encrypted token for repo access by the admin bot
+#          secure: 7xvY9HsADz3TiTRQ8yiumBWwCQ7GI+DrA04rlzzBo+G9DBCk7py3FvLLgfEvYW+u
+#      artifact: sardana_MSI, sardanaWHEEL
+#      draft: true
+#      on:
+#          branch: master                 # release from master branch only
+#          appveyor_repo_tag: true        # deploy on tag push only
