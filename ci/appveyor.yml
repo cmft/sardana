@@ -65,9 +65,8 @@ test_script:
     # At this point all install_requires dependencies MUST be installed
     # as this is installing only from dist/
     - pip install --pre --find-links dist/ --no-cache-dir --no-index sardana
-
-:: Print Python info
-pip list
+    # Print Python info
+    - pip list
     # Run the test script
     - "%TEST_SCRIPT%"
 
