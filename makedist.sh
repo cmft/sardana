@@ -33,6 +33,5 @@ rm -rf build
 python setup.py bdist_wininst --plat-name win install_scripts --wrappers --ignore-shebang 
 #create source tarball (without docs)
 rm  -rf build
-python setup.py sdist 
-
+python setup.py sdist
 
