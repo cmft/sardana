@@ -56,8 +56,8 @@ test_script:
     - conda install  -y  -c tango-controls pytango=9.2.1
     # Install itango
     - conda install -y -c tango-controls itango=0.1.6
-    # Loging root env
-    activate
+    # Login root env
+    - activate
     # Install taurus
     - pip install taurus
     # Install the generated sardana wheel package to test it
@@ -69,6 +69,8 @@ test_script:
     - pip list
     # Run the test script
     - "%TEST_SCRIPT%"
+    # Login out root env
+    - deactive
 
 
 artifacts:
