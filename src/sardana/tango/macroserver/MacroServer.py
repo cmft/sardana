@@ -63,8 +63,19 @@ class MacroServer(SardanaDevice):
         return self._macro_server
 
     def delete_device(self):
-        SardanaDevice.delete_device(self)
-        self._macro_server.clear_log_report()
+        try:
+            SardanaDevice.delete_device(self)
+            for pool in self._macro_server._pools.values():
+                elements_attr = pool.getAttribute("Elements")
+
+                print "delete_device", pool
+                elements_attr.removeListener(self._macro_server.on_pool_elements_changed)
+                elements_attr.removeListener(pool.on_elements_changed)
+            self._macro_server.clear_log_report()
+        except Exception,e:
+            print e
+            raise
+
 
     def init_device(self):
         SardanaDevice.init_device(self)
